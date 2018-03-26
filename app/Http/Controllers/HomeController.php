@@ -80,8 +80,8 @@ class HomeController extends Controller
             $origin_url = Cache::get($code);    
             $tmp = explode('-', $origin_url);
             if(isset($tmp[1])){
-                $customer_id = $tmp[1];
-                $origin_url = $tmp[0];
+                $customer_id = end($tmp);               
+                $origin_url = str_replace("-".$customer_id, "", $origin_url);
             }
         } else {
             $rs = DataVideo::where('code', $code)->first();
@@ -113,17 +113,76 @@ class HomeController extends Controller
         }else{
             $license = 0;
         }        
-        $video_url = $poster_url = '';        
+        $video_url = $poster_url = '';     
+         
         if($origin_url != ''){
             $ch = curl_init();
             curl_setopt( $ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1" );
             curl_setopt( $ch, CURLOPT_URL, $origin_url );
             curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
             curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            if(strpos($origin_url, 'xvideos') > 0){
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420.1 (KHTML, like Gecko) Version/3.0 Mobile/3B48b Safari/419.3');    
+            }
+            curl_setopt($ch, CURLOPT_REFERER, "https://www.xnxx.com");
+            //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $result = curl_exec($ch);            
             curl_close($ch);
-            if( strpos($result, 'streamable')){
+            $htmlGet = new simple_html_dom();                
+                $htmlGet->load($result);  
+
+            if(strpos($origin_url, 'xvideos') > 0){ 
+                    
+                $aGet  = $htmlGet->find('script',7)->innertext;
+                
+                $tmp1 = explode("setVideoUrlHigh('", $result);
+                
+                if(isset($tmp1[1])){
+                    $tmp2 = explode("');", $tmp1[1]);         
+                }else{
+                    
+                    $tmp1 = explode("setVideoUrlLow('", $result);     
+                    
+                    $tmp2 = explode("');", $tmp1[1]);         
+                }      
+                $video_url = $tmp2[0];
+                
+            }elseif(strpos($origin_url, 'hihi.com') > 0 ){
+                if($htmlGet->find('#player source', 0)){
+                    $video_url = $htmlGet->find('#player source', 0)->src;               
+                }
+                if($htmlGet->find('#player-openload', 0)){
+                    $video_url = $htmlGet->find('#player-openload', 0)->src; 
+                    $is_hihi = 1;
+                    $isXvideo = 0;
+                }
+            }elseif(strpos($origin_url, 'javbuz.com') > 0 ){
+                $video_url = $htmlGet->find('source[data-res]', 0)->src;
+                
+            }elseif(strpos($origin_url, 'xnxx.com') > 0 ){
+                     
+                $aGet  = $htmlGet->find('script',5)->innertext;
+                
+                $tmp1 = explode("setVideoUrlHigh('", $result);
+                
+                if(isset($tmp1[1])){
+                    $tmp2 = explode("');", $tmp1[1]);                   
+                }else{
+                    
+                    $tmp1 = explode("setVideoUrlLow('", $result);     
+                    
+                    $tmp2 = explode("');", $tmp1[1]);         
+                }      
+                $video_url = $tmp2[0];
+                
+            }elseif(strpos($origin_url, 'redtube.com') > 0){
+                $video_url = $htmlGet->find('source', 0)->src;
+            }elseif(strpos($origin_url, 'youporn.com') > 0){
+                $video_url = $htmlGet->find('.downloadOption', 0)->find('a', 0)->href;
+            }elseif(strpos($origin_url, 'tnaflix.com') > 0 ){
+                $video_url = $htmlGet->find('meta[itemprop=contentUrl]', 0)->content;
+            
+            }elseif( strpos($result, 'streamable')){
                 $tmp = explode('"url": "', $result);               
                 $tmp = explode('",', $tmp[1]);
                 $video_url = "https:".$tmp[0];    

@@ -4,12 +4,12 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
   <h1>
-    Thành viên
+    Members
   </h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-    <li><a href="{{ route( 'customer.index') }}">Thành viên</a></li>
-    <li class="active">Danh sách</li>
+    <li><a href="{{ route( 'customer.index') }}">Members</a></li>
+    <li class="active">List</li>
   </ol>
 </section>
 
@@ -22,54 +22,41 @@
       @endif     
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">Bộ lọc</h3>
+          <h3 class="panel-title">Filter</h3>
         </div>
         <div class="panel-body">
-          <form class="form-inline" role="form" method="GET" action="{{ route('customer.index') }}" id="frmContact">  
-             <div class="form-group">
-                <label for="name">Loại thành viên :</label>
-                <select class="form-control" name="type" id="type">
-                    <option value="">--Tất cả--</option>                                   
-                    <option value="1" {{ $type == 1 ? "selected" : "" }}>Facebook</option>
-                    <option value="2" {{ $type == 2 ? "selected" : "" }}>Đăng ký</option>                    
-                </select>
-            </div>
+          <form class="form-inline" role="form" method="GET" action="{{ route('customer.index') }}" id="frmContact">               
             <div class="form-group">
-              <label for="name">&nbsp;&nbsp;Họ tên :</label>
+              <label for="name">&nbsp;&nbsp;Full name :</label>
               <input type="text" class="form-control" name="fullname" value="{{ $fullname }}">
             </div>                                                 
             <div class="form-group">
               <label for="name">&nbsp;&nbsp;Email :</label>
               <input type="text" class="form-control" name="email" value="{{ $email }}">
-            </div>
-            <div class="form-group">
-              <label for="name">&nbsp;&nbsp;Điện thoại :</label>
-              <input type="text" class="form-control" name="phone" value="{{ $phone }}">
-            </div>
-            <button type="submit" class="btn btn-default btn-sm">Lọc</button>
+            </div>            
+            <button type="submit" class="btn btn-default btn-sm">Filter</button>
           </form>         
         </div>
       </div>
       <div class="box">
 
         <div class="box-header with-border">
-          <h3 class="box-title">Danh sách ( <span class="value">{{ $items->total() }} khách hàng )</span></h3>
+          <h3 class="box-title">List ( <span class="value">{{ $items->total() }} members )</span></h3>
         </div>
         
         <!-- /.box-header -->
         <div class="box-body">        
           <!--<a href="{{ route('customer.export') }}" class="btn btn-info btn-sm" style="margin-bottom:5px;float:left" target="_blank">Export</a>-->
           <div style="text-align:center">
-            {{ $items->appends( ['status' => $status, 'email' => $email, 'phone' => $phone, 'fullname' => $fullname, 'type' => $type] )->links() }}
+            {{ $items->appends( ['status' => $status, 'email' => $email, 'fullname' => $fullname] )->links() }}
           </div>  
           <table class="table table-bordered" id="table-list-data">
             <tr>
               <th style="width: 1%">#</th>                            
-              <th>Họ tên - Email</th>
-              <th>Số điện thoại</th>
-              <th width="120">Loại thành viên</th>              
-              <th width="10%">Thời gian tạo</th>
-              <th width="1%;white-space:nowrap">Thao tác</th>
+              <th>Full name</th>      
+              <td>Email</td>                                
+              <th width="10%">Created at</th>
+              <th width="1%;white-space:nowrap">Action</th>
             </tr>
             <tbody>
             @if( $items->count() > 0 )
@@ -82,22 +69,16 @@
                   @if($item->fullname != '')
                   {{ $item->fullname }}</br>
                   @endif
+                </td>
+                <td>
                   @if($item->email != '')
                   <a href="{{ route( 'customer.edit', [ 'id' => $item->id ]) }}">{{ $item->email }}</a>
                   @endif
-                 
-                </td>   
-                <td> @if($item->phone != '')
-                  {{ $item->phone }}</br>
-                  @endif</td>
-                <td>
-                  {{ $item->facebook_id > 0 ? "Facebook" : "Đăng ký" }}
-                </td>           
+                </td>
                 <td>{{ date('d-m-Y H:i', strtotime($item->created_at)) }}</td>
-                <td style="white-space:nowrap;text-align: right">      
-                @if($item->customerAddress->count() > 0)                            
-                  <a href="{{ route('customer.address', $item->id) }}" class="btn btn-sm btn-info">Sổ địa chỉ</a>
-                  @endif
+                <td style="white-space:nowrap;text-align: right">
+                  <a href="{{ route('customer.edit', $item->id) }}" class="btn btn-sm btn-info" title="Set hide player logo"><i class="fa fa-money"></i></a>
+                
                   <a onclick="return callDelete('{{ $item->email }}','{{ route( 'customer.destroy', [ 'id' => $item->id ]) }}');" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span></a>
                   
                 </td>
@@ -105,14 +86,14 @@
               @endforeach
             @else
             <tr>
-              <td colspan="9">Không có dữ liệu.</td>
+              <td colspan="9">No data.</td>
             </tr>
             @endif
 
           </tbody>
           </table>
           <div style="text-align:center">
-            {{ $items->appends( ['status' => $status, 'email' => $email, 'phone' => $phone, 'fullname' => $fullname, 'type' => $type] )->links() }}
+            {{ $items->appends( ['status' => $status, 'email' => $email, 'fullname' => $fullname] )->links() }}
           </div>  
         </div>        
       </div>

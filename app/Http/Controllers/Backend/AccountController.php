@@ -21,7 +21,7 @@ class AccountController extends Controller
     public function index(Request $request)
     {         
         if(Auth::user()->role < 3){
-            return redirect()->route('product.index');
+            return redirect()->route('customer.index');
         }
         $role = $leader_id = 0;
         $role = Auth::user()->role;
@@ -50,7 +50,7 @@ class AccountController extends Controller
     public function create()
     {        
         if(Auth::user()->role < 3){
-            return redirect()->route('product.index');
+            return redirect()->route('customer.index');
         }
         $modList = Account::where(['role' => 2, 'status' => 1])->get();
         
@@ -104,7 +104,7 @@ class AccountController extends Controller
     {
        
         if(Auth::user()->role < 3){
-            return redirect()->route('product.index');
+            return redirect()->route('customer.index');
         }
         $dataArr = $request->all();
          
@@ -152,7 +152,7 @@ class AccountController extends Controller
     public function destroy($id)
     {
         if(Auth::user()->role < 3){
-            return redirect()->route('product.index');
+            return redirect()->route('customer.index');
         }
         // delete
         $model = Account::find($id);
@@ -165,7 +165,7 @@ class AccountController extends Controller
     public function edit($id)
     {
         if(Auth::user()->role < 3){
-            return redirect()->route('product.index');
+            return redirect()->route('customer.index');
         }
         $detail = Account::find($id);
         
@@ -174,7 +174,7 @@ class AccountController extends Controller
     public function update(Request $request)
     {
         if(Auth::user()->role < 3){
-            return redirect()->route('product.index');
+            return redirect()->route('customer.index');
         }
         $dataArr = $request->all();
         
@@ -207,7 +207,7 @@ class AccountController extends Controller
     public function updateStatus(Request $request)
     {       
         if(Auth::user()->role < 3){
-            return redirect()->route('product.index');
+            return redirect()->route('customer.index');
         }
         $model = Account::find( $request->id );
 

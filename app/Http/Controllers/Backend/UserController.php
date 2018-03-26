@@ -19,13 +19,8 @@ class UserController extends Controller
     */
     public function loginForm()
     {        
-        if(Auth::check()){
-            if(Auth::user()->id != 5){
-                return redirect()->route('product.index');    
-            }else{
-                return redirect()->route('orders.index');    
-            }
-            
+        if(Auth::check()){            
+            return redirect()->route('customer.index');
         } 
         return view('backend.login');
     }
@@ -45,8 +40,8 @@ class UserController extends Controller
             'password' => 'required'
         ],
         [
-            'email.required' => 'Bạn chưa nhập email',
-            'password.required' => 'Bạn chưa nhập mật khẩu'            
+            'email.required' => 'Please enter email',
+            'password.required' => 'Please enter password'            
         ]);
         $dataArr = [
             'email' => $request->email,
@@ -54,23 +49,17 @@ class UserController extends Controller
         ];
         if (Auth::validate($dataArr)) {
             $dataArr['status'] = 1;
-            if (Auth::attempt($dataArr)) {                    
-                if(Auth::user()->id != 5 && Auth::user()->role  > 1){
-                    return redirect()->route('product.index');    
-                }else{
-                    return redirect()->route('orders.index');    
-                }
+            if (Auth::attempt($dataArr)) {  
+                return redirect()->route('customer.index'); 
             }else{
-                Session::flash('error', 'Tài khoản đã bị khóa.'); 
+                Session::flash('error', 'Account has been locked.'); 
                 return redirect()->route('backend.login-form'); 
             }
         }else {
             // if any error send back with message.
-            Session::flash('error', 'Email hoặc mật khẩu không đúng.'); 
+            Session::flash('error', 'Email or password incorret.'); 
             return redirect()->route('backend.login-form');
         }
-
-        return redirect()->route('parent-cate.index');
     }
   
     public function logout()

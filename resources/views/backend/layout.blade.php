@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}" />
-  <title>K KAFFEE | Dashboard</title>
+  <title>PARSE LINK | Dashboard</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   
@@ -62,7 +62,6 @@
         </form>
     </div>
 </div>
-@include('backend.customer.customer-notification-modal')
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
@@ -120,6 +119,7 @@ $(document).ready(function(){
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
   });
+  $('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
 });
 </script>
 <style type="text/css">

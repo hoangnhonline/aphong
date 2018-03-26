@@ -2,7 +2,7 @@
 <html >
   <head>
     <meta charset="UTF-8">
-    <title>K KAFFEE - Đăng nhập hệ thống</title>
+    <title>PARSE LINK - System login</title>
     
     
     <link rel="stylesheet" href="css/reset.css">
@@ -162,7 +162,7 @@ body {
 <!-- Form Module-->
 <div class="module form-module"> 
   <div class="form" >    
-    <h2 style="text-align:center">Đăng nhập hệ thống</h2>
+    <h2 style="text-align:center">SYSTEM LOGIN</h2>
     @if(Session::has('error'))
         <div class="alert alert-danger">
             {{ Session::get('error') }}
@@ -171,7 +171,7 @@ body {
     <form method="POST" action="{{ route('backend.check-login') }}">
       {!! csrf_field() !!}
       <input type="email" placeholder="Email" name="email" />
-      <input type="password" placeholder="Mật khẩu" name="password" />
+      <input type="password" placeholder="Pasword" name="password" />
       <button>Login</button>
     </form>
   </div>

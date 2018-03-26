@@ -32,13 +32,14 @@ Route::group(['prefix' => 'social-auth'], function () {
 Route::group(['prefix' => 'authentication'], function () {
     Route::post('check_login', ['as' => 'auth-login', 'uses' => 'AuthenticationController@checkLogin']);
     Route::post('login_ajax', ['as' =>  'auth-login-ajax', 'uses' => 'AuthenticationController@checkLoginAjax']);
-    Route::get('/user-logout', ['as' => 'user-logout', 'uses' => 'AuthenticationController@logout']);
+    Route::get('/user-logout', ['as' => 'logout', 'uses' => 'AuthenticationController@logout']);
 });
-
+Route::get('/', ['uses' => 'HomeController@index', 'as' => 'home']);
+Route::post('/', ['uses' => 'HomeController@store', 'as' => 'store']);
+Route::get('/play/{code}', ['uses' => 'HomeController@play', 'as' => 'play']);
 Route::group(['namespace' => 'Frontend'], function()
 {
-    Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);   
-    Route::get('/rss', ['as' => 'rss', 'uses' => 'HomeController@rss']);
+    
     Route::post('/rating', ['as' => 'rating', 'uses' => 'HomeController@insertRating']);    
     Route::get('/search-product', ['as' => 'search-product', 'uses' => 'HomeController@searchProduct']);    
     Route::post('/send-contact', ['as' => 'send-contact', 'uses' => 'ContactController@store']);

@@ -1,14 +1,6 @@
 <?php
 namespace App\Helpers;
 use App\Helpers\simple_html_dom;
-use App\Models\City;
-use App\Models\Price;
-use App\Models\Area;
-use App\Models\CounterValues;
-use App\Models\CounterIps;
-use App\Models\Settings;
-use App\Models\OrderDetail;
-use App\Models\Branch;
 
 use DB, Image, Auth;
 

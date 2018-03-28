@@ -11,7 +11,56 @@ use App\Models\Customer;
 
 class HomeController extends Controller
 {
-    public function index(Request $request){             
+    
+
+    public function facebook($url) {
+        $useragent = 'Mozilla/5.0 (Linux; U; Android 2.3.3; de-de; HTC Desire Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1';
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $source = curl_exec($ch);
+        curl_close($ch);
+        
+        $download = explode('/video_redirect/?src=', $source);
+        $download = explode('&amp', $download[1]);
+        $download = rawurldecode($download[0]);
+        return $download;
+    }
+    public function youtube($url){
+        preg_match("/^(?:http(?:s)?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:(?:watch)?\?(?:.*   &)?v(?:i)?=|(?:embed|v|vi|user)\/))([^\?&\"'>]+)/", $url, $matches);    
+        if(isset($matches[1])){
+            $id = $matches[1];
+        }else{
+            return '';
+        }
+        parse_str(file_get_contents('http://www.youtube.com/get_video_info?video_id='.$id), $video_data);        
+        $streams = $video_data['url_encoded_fmt_stream_map'];
+        $streams = explode(',',$streams);
+        $counter = 1;        
+        foreach ($streams as $streamdata) {
+            parse_str($streamdata,$streamdata);            
+            foreach ($streamdata as $key => $value) {
+                
+                if ($key == "url") {
+                    return $video_url = urldecode($value);                                        
+                }
+            }
+        }
+        return $video_url;
+    }
+    public function index(Request $request){   
+       // $video_url = $this->youtube('https://www.youtube.com/watch?v=l_ztjxtEXhU');
+       // dd($video_url);
+  
+        //$url = 'https://www.facebook.com/dovuviphuong/videos/1648044448636293/';
+
+      // $this->facebook($url);
+
         $ax_url = $request->ax_url ? $request->ax_url : null;
         $code = '';
         if($ax_url){
@@ -53,8 +102,7 @@ class HomeController extends Controller
             ]);
             
             $rs = DataVideo::where('origin_url', $ax_url)->where('customer_id', $customer_id)->first();
-            if(!$rs){
-                
+            if(!$rs){                
                 if($customer_id){
                     $code = md5($ax_url."-".$customer_id);             
                     DataVideo::create(['origin_url' => $ax_url, 'code' => $code, 'customer_id' => $customer_id]);
@@ -62,9 +110,11 @@ class HomeController extends Controller
                     $detailCustomer = Customer::find($customer_id);
                     Cache::put("valid-".$customer_id, $detailCustomer->valid_from.":".$detailCustomer->valid_to, 1800);
                 }else{
+                    $code = md5($ax_url);    
                     $cache_url = $ax_url;
                 }
                 Cache::put($code, $cache_url, 1800);
+                //dd($ax_url, $code);
             }else{
                 $code = $rs->code;               
             }
@@ -116,128 +166,135 @@ class HomeController extends Controller
         $video_url = $poster_url = '';     
          
         if($origin_url != ''){
-            $ch = curl_init();
-            curl_setopt( $ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1" );
-            curl_setopt( $ch, CURLOPT_URL, $origin_url );
-            curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
-            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-            if(strpos($origin_url, 'xvideos') > 0){
-                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420.1 (KHTML, like Gecko) Version/3.0 Mobile/3B48b Safari/419.3');    
-            }
-            curl_setopt($ch, CURLOPT_REFERER, "https://www.xnxx.com");
-            //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            $result = curl_exec($ch);            
-            curl_close($ch);
-            $htmlGet = new simple_html_dom();                
-                $htmlGet->load($result);  
+            if(strpos($origin_url, 'facebook.com') > 0){
+                $video_url = $this->facebook($origin_url);
+            }elseif(strpos($origin_url, 'youtube.com') > 0){                
+                $video_url = $this->youtube($origin_url);
+            }else{
+                $ch = curl_init();
+                curl_setopt( $ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1" );
+                curl_setopt( $ch, CURLOPT_URL, $origin_url );
+                curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
+                curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+                if(strpos($origin_url, 'xvideos') > 0){
+                    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420.1 (KHTML, like Gecko) Version/3.0 Mobile/3B48b Safari/419.3');    
+                }
+                //curl_setopt($ch, CURLOPT_REFERER, "https://www.xnxx.com");
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $result = curl_exec($ch);            
+                curl_close($ch);
+                $htmlGet = new simple_html_dom();                
+                    $htmlGet->load($result);  
 
-            if(strpos($origin_url, 'xvideos') > 0){ 
+                if(strpos($origin_url, 'xvideos') > 0){ 
+                        
+                    $aGet  = $htmlGet->find('script',7)->innertext;
                     
-                $aGet  = $htmlGet->find('script',7)->innertext;
-                
-                $tmp1 = explode("setVideoUrlHigh('", $result);
-                
-                if(isset($tmp1[1])){
-                    $tmp2 = explode("');", $tmp1[1]);         
-                }else{
+                    $tmp1 = explode("setVideoUrlHigh('", $result);
                     
-                    $tmp1 = explode("setVideoUrlLow('", $result);     
+                    if(isset($tmp1[1])){
+                        $tmp2 = explode("');", $tmp1[1]);         
+                    }else{
+                        
+                        $tmp1 = explode("setVideoUrlLow('", $result);     
+                        
+                        $tmp2 = explode("');", $tmp1[1]);         
+                    }      
+                    $video_url = $tmp2[0];
                     
-                    $tmp2 = explode("');", $tmp1[1]);         
-                }      
-                $video_url = $tmp2[0];
-                
-            }elseif(strpos($origin_url, 'hihi.com') > 0 ){
-                if($htmlGet->find('#player source', 0)){
-                    $video_url = $htmlGet->find('#player source', 0)->src;               
-                }
-                if($htmlGet->find('#player-openload', 0)){
-                    $video_url = $htmlGet->find('#player-openload', 0)->src; 
-                    $is_hihi = 1;
-                    $isXvideo = 0;
-                }
-            }elseif(strpos($origin_url, 'javbuz.com') > 0 ){
-                $video_url = $htmlGet->find('source[data-res]', 0)->src;
-                
-            }elseif(strpos($origin_url, 'xnxx.com') > 0 ){
-                     
-                $aGet  = $htmlGet->find('script',5)->innertext;
-                
-                $tmp1 = explode("setVideoUrlHigh('", $result);
-                
-                if(isset($tmp1[1])){
-                    $tmp2 = explode("');", $tmp1[1]);                   
-                }else{
-                    
-                    $tmp1 = explode("setVideoUrlLow('", $result);     
-                    
-                    $tmp2 = explode("');", $tmp1[1]);         
-                }      
-                $video_url = $tmp2[0];
-                
-            }elseif(strpos($origin_url, 'redtube.com') > 0){
-                $video_url = $htmlGet->find('source', 0)->src;
-            }elseif(strpos($origin_url, 'youporn.com') > 0){
-                $video_url = $htmlGet->find('.downloadOption', 0)->find('a', 0)->href;
-            }elseif(strpos($origin_url, 'tnaflix.com') > 0 ){
-                $video_url = $htmlGet->find('meta[itemprop=contentUrl]', 0)->content;
-            
-            }elseif( strpos($result, 'streamable')){
-                $tmp = explode('"url": "', $result);               
-                $tmp = explode('",', $tmp[1]);
-                $video_url = "https:".$tmp[0];    
-                $tmpPoster = explode('"thumbnail_url": "', $result);
-                $tmp = explode('",', $tmpPoster[1]);
-                $poster_url = "https:".$tmp[0];                                      
-            }elseif( strpos($origin_url, 'fastplay.to')){                
-                $crawler = new simple_html_dom();                
-                $crawler->load($result); 
-                $js = $crawler->find('script', 7)->innertext;
-                $unpack = new JavascriptUnpacker;
-                $tmpScript = $unpack->unpack($js);                
-                                              
-                $tmp = explode('{file:"', $tmpScript);
-               
-                if(isset($tmp[4])){
-                    $tmp = explode('"', $tmp[4]);   
-                    $video_url = $tmp[0];                 
-                }elseif(isset($tmp[3])){
-                    $tmp = explode('"', $tmp[3]);   
-                    $video_url = $tmp[0];    
-                }elseif(isset($tmp[2])){
-                    $tmp = explode('"', $tmp[2]);   
-                    $video_url = $tmp[0];    
-                }elseif(isset($tmp[1])){
-                    $tmp = explode('"', $tmp[1]);   
-                    $video_url = $tmp[0];    
-                }
-                
-                $tmpPoster = explode('image:"', $tmpScript);
-              
-                if(isset($tmpPoster[1])){
-                    $tmp = explode('"', $tmpPoster[1]);   
-                    $poster_url = $tmp[0];                 
-                }
-            }else{                
-                $crawler = new simple_html_dom();                
-                $crawler->load($result); 
-                if($crawler->find('script', 4)){
-                    $js = $crawler->find('script', 4)->innertext;
-                    $unpack = new JavascriptUnpacker;
-                    $tmpScript = $unpack->unpack($js);                               
-                    $tmp = explode('{file:"', $tmpScript);
-                    if(isset($tmp[1])){
-                        $tmp = explode('"', $tmp[1]);   
-                        $video_url = $tmp[0];                 
+                }elseif(strpos($origin_url, 'hihi.com') > 0 ){
+                    if($htmlGet->find('#player source', 0)){
+                        $video_url = $htmlGet->find('#player source', 0)->src;               
                     }
-                    $tmpPoster = explode('image:"', $tmpScript);              
+                    if($htmlGet->find('#player-openload', 0)){
+                        $video_url = $htmlGet->find('#player-openload', 0)->src; 
+                        $is_hihi = 1;
+                        $isXvideo = 0;
+                    }
+                }elseif(strpos($origin_url, 'javbuz.com') > 0 ){
+                    $video_url = $htmlGet->find('source[data-res]', 0)->src;
+                    
+                }elseif(strpos($origin_url, 'xnxx.com') > 0 ){
+                         
+                    $aGet  = $htmlGet->find('script',5)->innertext;
+                    
+                    $tmp1 = explode("setVideoUrlHigh('", $result);
+                    
+                    if(isset($tmp1[1])){
+                        $tmp2 = explode("');", $tmp1[1]);                   
+                    }else{
+                        
+                        $tmp1 = explode("setVideoUrlLow('", $result);     
+                        
+                        $tmp2 = explode("');", $tmp1[1]);         
+                    }      
+                    $video_url = $tmp2[0];
+                    
+                }elseif(strpos($origin_url, 'redtube.com') > 0){
+                    $video_url = $htmlGet->find('source', 0)->src;
+                }elseif(strpos($origin_url, 'youporn.com') > 0){
+                    $video_url = $htmlGet->find('.downloadOption', 0)->find('a', 0)->href;
+                }elseif(strpos($origin_url, 'tnaflix.com') > 0 ){
+                    $video_url = $htmlGet->find('meta[itemprop=contentUrl]', 0)->content;
+                
+                }elseif( strpos($result, 'streamable')){
+                    $tmp = explode('"url": "', $result);               
+                    $tmp = explode('",', $tmp[1]);
+                    $video_url = "https:".$tmp[0];    
+                    $tmpPoster = explode('"thumbnail_url": "', $result);
+                    $tmp = explode('",', $tmpPoster[1]);
+                    $poster_url = "https:".$tmp[0];                                      
+                }elseif( strpos($origin_url, 'fastplay.to')){                
+                    $crawler = new simple_html_dom();                
+                    $crawler->load($result); 
+                    $js = $crawler->find('script', 7)->innertext;
+                    $unpack = new JavascriptUnpacker;
+                    $tmpScript = $unpack->unpack($js);                
+                                                  
+                    $tmp = explode('{file:"', $tmpScript);
+                   
+                    if(isset($tmp[4])){
+                        $tmp = explode('"', $tmp[4]);   
+                        $video_url = $tmp[0];                 
+                    }elseif(isset($tmp[3])){
+                        $tmp = explode('"', $tmp[3]);   
+                        $video_url = $tmp[0];    
+                    }elseif(isset($tmp[2])){
+                        $tmp = explode('"', $tmp[2]);   
+                        $video_url = $tmp[0];    
+                    }elseif(isset($tmp[1])){
+                        $tmp = explode('"', $tmp[1]);   
+                        $video_url = $tmp[0];    
+                    }
+                    
+                    $tmpPoster = explode('image:"', $tmpScript);
+                  
                     if(isset($tmpPoster[1])){
                         $tmp = explode('"', $tmpPoster[1]);   
                         $poster_url = $tmp[0];                 
-                    }                
-                }
-                
-            }            
+                    }
+                }else{                
+                    $crawler = new simple_html_dom();                
+                    $crawler->load($result); 
+                    if($crawler->find('script', 4)){
+                        $js = $crawler->find('script', 4)->innertext;
+                        $unpack = new JavascriptUnpacker;
+                        $tmpScript = $unpack->unpack($js);                               
+                        $tmp = explode('{file:"', $tmpScript);
+                        if(isset($tmp[1])){
+                            $tmp = explode('"', $tmp[1]);   
+                            $video_url = $tmp[0];                 
+                        }
+                        $tmpPoster = explode('image:"', $tmpScript);              
+                        if(isset($tmpPoster[1])){
+                            $tmp = explode('"', $tmpPoster[1]);   
+                            $poster_url = $tmp[0];                 
+                        }                
+                    }
+                    
+                }   
+            }
+                     
             return view('play', compact('video_url', 'poster_url', 'license'));    
         }else{
             dd('Invalid code');

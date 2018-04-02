@@ -102,6 +102,19 @@ class HomeController extends Controller
         $ax_url = $request->ax_url ? $request->ax_url : null;
         $code = '';
         if($ax_url){
+            if( strpos($ax_url, 'xvideos') == 0
+                && strpos($ax_url, 'xnxx.com') == 0
+                && strpos($ax_url, 'tnaffix') == 0
+                && strpos($ax_url, 'facebook') == 0 
+                && strpos($ax_url, 'streamable.com') == 0 
+                && strpos($ax_url, 'nodefiles.com') == 0                
+
+        ){
+                Session::put('not-support', 1);
+            return redirect()->route('home');
+            }else{
+                Session::forget('not-support');
+            }
             $customer_id = Session::get('userId') ? Session::get('userId') : null;
             $this->validate($request,[
                 'ax_url' => 'required|url'            

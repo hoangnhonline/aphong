@@ -63,6 +63,15 @@
 				<div class="container">		
 
 					<div id="form_container">    
+						@if(Session::get('not-support'))
+						<div class="alert alert-danger">
+	                          <ul>
+	                             
+	                                  <li>Your link does not support, please try another link.</li>
+	                             
+	                          </ul>
+	                      </div>
+						@endif
 						@if (count($errors) > 0)
 	                      <div class="alert alert-danger">
 	                          <ul>

@@ -63,6 +63,17 @@
 		<div class="container">
 			<div style="background-color: #FFF;padding: 20px">
 				<h3 style="margin-bottom: 20px;">MY LINKS ({{ $items->total() }})</h3>
+				<div style="margin-bottom:15px">
+					<form method="GET" action="{{ route('link') }}">
+					<div class="input-group">
+                      <input type="text" name="keyword" value="{!! $keyword !!}" class="form-control" placeholder="Original link..." />
+                      <span class="input-group-btn">
+                        <input type="submit" value="Search" class="btn btn-info">
+                      </span>
+                    </div>
+                    </form>
+					
+				</div>
 				<div class="table-responsive">
 					@if( $items->count() > 0)
 					<table class="table table-striped">

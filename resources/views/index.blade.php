@@ -105,7 +105,7 @@
 						    <div class="input-group">
 	                          <input style="background-color: #FFF !important; box-shadow:none !important;margin-right: 5px !important" type="text" id="linkresult" value="{{ route('play', [$code]) }}" class="form-control" readonly="readonly">
 	                          <span class="input-group-btn">
-	                            <button type="button" onclick="copyLink()" class="btn btn-default">COPY</button>
+	                            <button type="button" onclick="copyLink()" class="btn btn-info">COPY</button>
 	                          </span>
 	                        </div>
 						  </div>
@@ -113,7 +113,7 @@
 						  	<div class="input-group">
 						    <textarea class="form-control" id="embedcode"><iframe width="560" height="315" src="{{ route('play', [$code]) }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen readonly="readonly"></iframe></textarea>
 						    <span class="input-group-btn">
-	                            <button type="button" onclick="copyLink2()" class="btn btn-default">COPY</button>
+	                            <button type="button" onclick="copyLink2()" class="btn btn-info">COPY</button>
 	                          </span>
 	                      </div>
 						  </div>
@@ -127,7 +127,7 @@
 			</div>
 		</div>		
 	</div><!-- /wrapper -->
-	<input type="hidden" id="route-ajax-login-fb" value="https://toolshot.net/social-auth/facebook/fb-login">
+	<input type="hidden" id="route-ajax-login-fb" value="http://deal.local/social-auth/facebook/fb-login">
 	<input type="hidden" id="fb-app-id" value="{{ env('FACEBOOK_APP_ID') }}">    
 	<script src="{{ URL::asset('public/assets/js/jquery.min.js') }}"></script>
     <!-- ===== JS Bootstrap ===== -->

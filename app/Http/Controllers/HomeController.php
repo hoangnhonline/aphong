@@ -88,14 +88,19 @@ class HomeController extends Controller
         return view('index', compact('ax_url', 'code'));
     }
     public function link(Request $request){
+        $keyword = $request->keyword ? trim($request->keyword) : null;
         $user_id = Session::get('userId');
         if(!$user_id){
             return redirect()->route('home');
         }
         $page = $request->page ? $request->page : 1;
         $limit = 100;
-        $items = DataVideo::where('customer_id', $user_id)->orderBy('id', 'desc')->paginate($limit);
-        return view('link', compact('items', 'page', 'limit'));
+        $query = DataVideo::where('customer_id', $user_id);
+        if($keyword){
+            $query->where('origin_url', $keyword);
+        }
+        $items = $query->orderBy('id', 'desc')->paginate($limit);
+        return view('link', compact('items', 'page', 'limit', 'keyword'));
 
     }
     public function store(Request $request){             

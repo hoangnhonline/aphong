@@ -33,7 +33,7 @@
 			<div class="container">
 				<h1 class="header-logo">
 					<a href="{{ route('home')}}">
-						<img src="{{ URL::asset('public/assets/images/logo.png') }}" alt="Logo">
+						<img width="96"  src="{{ URL::asset('public/assets/images/logo.png') }}" alt="Logo">
 					</a>
 				</h1>
 				<div class="btn-group block-btn-header">

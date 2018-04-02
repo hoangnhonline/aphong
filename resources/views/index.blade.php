@@ -108,7 +108,7 @@
 						  </div>
 						  <div id="menu1" class="tab-pane fade" style="margin-top: 10px;">
 						  	<div class="input-group">
-						    <textarea class="form-control"><iframe width="560" height="315" src="{{ route('play', [$code]) }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen id="embedcode" readonly="readonly"></iframe></textarea>
+						  		<input style="background-color: #FFF !important; box-shadow:none !important;margin-right: 5px !important;height:40px" type="text" id="linkresult" value='<iframe width="560" height="315" src="{{ route("play", [$code]) }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen id="embedcode" readonly="readonly"></iframe>' class="form-control" readonly="readonly">						    
 						    <span class="input-group-btn">
 	                            <button type="button" onclick="copyLink2()" class="btn btn-default">COPY</button>
 	                          </span>

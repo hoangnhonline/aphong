@@ -27,6 +27,9 @@ class HomeController extends Controller
         $source = curl_exec($ch);
         curl_close($ch);        
         $download = explode('/video_redirect/?src=', $source);
+        if(!isset($download[1])){
+             echo "Your link does not support, please try another link.";die;
+        }
         $download = explode('&amp', $download[1]);
         $download = rawurldecode($download[0]);
 

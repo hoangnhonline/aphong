@@ -99,7 +99,7 @@
 					</tbody>
 					</table>
 					<div style="text-align: center;">
-						{{ $items->links() }}
+						{{ $items->appends($keyword)->links() }}
 					</div>
 					@endif
 				</div>

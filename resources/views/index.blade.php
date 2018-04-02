@@ -127,7 +127,7 @@
 			</div>
 		</div>		
 	</div><!-- /wrapper -->
-	<input type="hidden" id="route-ajax-login-fb" value="http://deal.local/social-auth/facebook/fb-login">
+	<input type="hidden" id="route-ajax-login-fb" value="https://toolshot.net/social-auth/facebook/fb-login">
 	<input type="hidden" id="fb-app-id" value="{{ env('FACEBOOK_APP_ID') }}">    
 	<script src="{{ URL::asset('public/assets/js/jquery.min.js') }}"></script>
     <!-- ===== JS Bootstrap ===== -->

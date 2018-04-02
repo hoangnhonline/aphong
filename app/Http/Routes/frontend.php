@@ -32,3 +32,4 @@ Route::group(['prefix' => 'authentication'], function () {
 Route::get('/', ['uses' => 'HomeController@index', 'as' => 'home']);
 Route::post('/', ['uses' => 'HomeController@store', 'as' => 'store']);
 Route::get('/play/{code}', ['uses' => 'HomeController@play', 'as' => 'play']);
+Route::get('/my-link', ['uses' => 'HomeController@link', 'as' => 'link']);

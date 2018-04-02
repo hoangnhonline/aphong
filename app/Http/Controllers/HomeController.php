@@ -88,6 +88,17 @@ class HomeController extends Controller
 
         return view('index', compact('ax_url', 'code'));
     }
+    public function link(Request $request){
+        $user_id = Session::get('userId');
+        if(!$user_id){
+            return redirect()->route('home');
+        }
+        $page = $request->page ? $request->page : 1;
+        $limit = 2;
+        $items = DataVideo::where('customer_id', $user_id)->orderBy('id', 'desc')->paginate($limit);
+        return view('link', compact('items', 'page', 'limit'));
+
+    }
     public function store(Request $request){             
         $ax_url = $request->ax_url ? $request->ax_url : null;
         $code = '';

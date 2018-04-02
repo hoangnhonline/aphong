@@ -47,7 +47,10 @@
 					<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
 						<span><img src="{{ Session::get('avatar') ? Session::get('avatar') :  URL::asset('public/assets/img/icon.png') }}" class="user-image"></span> Hello, {{ Session::get('username') }}
 					</a>
-					<ul class="dropdown-menu animated fadeInRight">	                    
+					<ul class="dropdown-menu animated fadeInRight">	   
+						<li>
+	                        <a href="{{ route('link') }}" title="My links">My links</a>
+	                    </li>                 
 	                    <li class="divider"></li>
 	                    <li>
 	                        <a href="{{ route('logout') }}" title="Logout">Logout</a>

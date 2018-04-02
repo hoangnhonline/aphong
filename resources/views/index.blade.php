@@ -135,7 +135,17 @@
     <script src="{{ URL::asset('public/assets/lib/wow/wow.min.js') }}"></script>
     <!-- Js Common -->
     <script src="{{ URL::asset('public/assets/js/common.js') }}"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116651436-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-116651436-1');
+</script>
 	<script>
+
 		$('#box-table').css({
 			position: 'absolute',
 			top: 0,

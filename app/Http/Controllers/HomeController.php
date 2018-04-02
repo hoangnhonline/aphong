@@ -45,7 +45,7 @@ class HomeController extends Controller
         if(isset($matches[1])){
             $id = $matches[1];
         }else{
-            return '';
+            echo "Your link does not support, please try another link.";die;
         }
         parse_str(file_get_contents('http://www.youtube.com/get_video_info?video_id='.$id), $video_data);        
         $streams = $video_data['url_encoded_fmt_stream_map'];

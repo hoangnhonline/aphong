@@ -12,6 +12,15 @@
 	</div>
 	
 	<script type="text/javascript" src="{{ URL::asset('public/assets/plugins/jwplayer/jwplayer.js') }}" ></script>	
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116651436-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-116651436-1');
+</script>
 	<script>
 	var purl='{!! $video_url !!}';
 	var pimg='{!! $poster_url !!}';

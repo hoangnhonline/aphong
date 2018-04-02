@@ -14,6 +14,7 @@ class HomeController extends Controller
     
 
     public function facebook($url) {
+        $poster_url = $video_url = '';
         $useragent = 'Mozilla/5.0 (Linux; U; Android 2.3.3; de-de; HTC Desire Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1';
         
         $ch = curl_init();
@@ -24,12 +25,17 @@ class HomeController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         $source = curl_exec($ch);
-        curl_close($ch);
-        
+        curl_close($ch);        
         $download = explode('/video_redirect/?src=', $source);
         $download = explode('&amp', $download[1]);
         $download = rawurldecode($download[0]);
-        return $download;
+
+        $tmp = explode('property="og:image" content="', $source);
+        if(isset($tmp[1])){
+            $tmp2 = explode('" />', $tmp[1]);
+            $poster_url = str_replace("&amp;", "&", $tmp2[0]);
+        }        
+        return ['video_url' => $download, 'poster_url' => $poster_url];
     }
     public function youtube($url){
         preg_match("/^(?:http(?:s)?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:(?:watch)?\?(?:.*   &)?v(?:i)?=|(?:embed|v|vi|user)\/))([^\?&\"'>]+)/", $url, $matches);    
@@ -54,13 +60,6 @@ class HomeController extends Controller
         return $video_url;
     }
     public function index(Request $request){   
-       // $video_url = $this->youtube('https://www.youtube.com/watch?v=l_ztjxtEXhU');
-       // dd($video_url);
-  
-        //$url = 'https://www.facebook.com/dovuviphuong/videos/1648044448636293/';
-
-      // $this->facebook($url);
-
         $ax_url = $request->ax_url ? $request->ax_url : null;
         $code = '';
         if($ax_url){
@@ -140,7 +139,7 @@ class HomeController extends Controller
         if (Cache::has($code)){
             $origin_url = Cache::get($code);    
             $tmp = explode('-', $origin_url);
-            if(isset($tmp[1])){
+            if( end($tmp) > 0){
                 $customer_id = end($tmp);               
                 $origin_url = str_replace("-".$customer_id, "", $origin_url);
             }
@@ -155,18 +154,20 @@ class HomeController extends Controller
             Cache::put($code, $cache_url, 1800);
         }
         
-        if($customer_id){            
+        if($customer_id > 0){            
             if(Cache::has("valid-".$customer_id)){
                 $valid_str = Cache::get("valid-".$customer_id);
 
                 $tmpValid = explode(':', $valid_str);
-                //dd($tmpValid);
+                
                 if(isset($tmpValid[1]) && $tmpValid[1] !=''){
+                    
                     if(date('Y-m-d')<= $tmpValid[1] && date('Y-m-d') >= $tmpValid[0]){
                         $license = 1;
                     }else{
                         $license = 0;
                     }
+                    
                 }else{
                     $license = 0;        
                 }
@@ -174,11 +175,14 @@ class HomeController extends Controller
         }else{
             $license = 0;
         }        
+        
         $video_url = $poster_url = '';     
          
         if($origin_url != ''){
             if(strpos($origin_url, 'facebook.com') > 0){
-                $video_url = $this->facebook($origin_url);
+                $tmp = $this->facebook($origin_url);
+                $video_url = $tmp['video_url'];
+                $poster_url = $tmp['poster_url'];
             }elseif(strpos($origin_url, 'youtube.com') > 0){                
                 $video_url = $this->youtube($origin_url);
             }else{
@@ -187,31 +191,35 @@ class HomeController extends Controller
                 curl_setopt( $ch, CURLOPT_URL, $origin_url );
                 curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
                 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-                if(strpos($origin_url, 'xvideos') > 0){
+                if(strpos($origin_url, 'xvideos') > 0 || strpos($origin_url, 'xnxx.com') > 0){
                     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420.1 (KHTML, like Gecko) Version/3.0 Mobile/3B48b Safari/419.3');    
                 }
                 //curl_setopt($ch, CURLOPT_REFERER, "https://www.xnxx.com");
                 //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 $result = curl_exec($ch);            
+                
                 curl_close($ch);
                 $htmlGet = new simple_html_dom();                
-                    $htmlGet->load($result);  
+                $htmlGet->load($result);  
 
                 if(strpos($origin_url, 'xvideos') > 0){ 
-                        
-                    $aGet  = $htmlGet->find('script',7)->innertext;
-                    
+                  
                     $tmp1 = explode("setVideoUrlHigh('", $result);
                     
                     if(isset($tmp1[1])){
                         $tmp2 = explode("');", $tmp1[1]);         
-                    }else{
-                        
-                        $tmp1 = explode("setVideoUrlLow('", $result);     
-                        
+                    }else{                        
+                        $tmp1 = explode("setVideoUrlLow('", $result);                             
                         $tmp2 = explode("');", $tmp1[1]);         
-                    }      
+                    }  
+
                     $video_url = $tmp2[0];
+
+                    $tmpThumb = explode("setThumbUrl('", $result);
+                    if(isset($tmpThumb[1])){
+                        $tmpThum2 = explode("');", $tmpThumb[1]);         
+                        $poster_url = $tmpThum2[0];
+                    }
                     
                 }elseif(strpos($origin_url, 'hihi.com') > 0 ){
                     if($htmlGet->find('#player source', 0)){
@@ -225,9 +233,7 @@ class HomeController extends Controller
                 }elseif(strpos($origin_url, 'javbuz.com') > 0 ){
                     $video_url = $htmlGet->find('source[data-res]', 0)->src;
                     
-                }elseif(strpos($origin_url, 'xnxx.com') > 0 ){
-                         
-                    $aGet  = $htmlGet->find('script',5)->innertext;
+                }elseif(strpos($origin_url, 'xnxx.com') > 0 ){                        
                     
                     $tmp1 = explode("setVideoUrlHigh('", $result);
                     
@@ -240,6 +246,12 @@ class HomeController extends Controller
                         $tmp2 = explode("');", $tmp1[1]);         
                     }      
                     $video_url = $tmp2[0];
+
+                    $tmpThumb = explode("setThumbUrl('", $result);
+                    if(isset($tmpThumb[1])){
+                        $tmpThum2 = explode("');", $tmpThumb[1]);         
+                        $poster_url = $tmpThum2[0];
+                    }
                     
                 }elseif(strpos($origin_url, 'redtube.com') > 0){
                     $video_url = $htmlGet->find('source', 0)->src;

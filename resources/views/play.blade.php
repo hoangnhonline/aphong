@@ -22,7 +22,7 @@
 		key:'tjQq7CNG7oULq6qy+s5IUmOtg0JusfzoTjBSTQ==',cast:
 			{
 		}
-		,width:'100%',type:'',file:'{!! $video_url !!}',image:pimg,logo:
+		,width:'100%',type:'',file:purl,image:pimg,logo:
 			{
 			file:"../public/assets/images/download.svg",position:'bottom-right',margin:'0',link:"http://google.com"
 		}
@@ -36,7 +36,7 @@
 		key:'dWwDdbLI0ul1clbtlw+4/UHPxlYmLoE9Ii9QEw==',cast:
 			{
 		}
-		,width:'100%',type:'',file:'{!! $video_url !!}',image:pimg
+		,width:'100%',type:'',file:purl,image:pimg
 	}
 	);
 

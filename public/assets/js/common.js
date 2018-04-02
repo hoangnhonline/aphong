@@ -27,6 +27,19 @@ function copyLink() {
   /* Alert the copied text */
   alert("Copied the link: " + copyText.value);
 }
+function copyLink2() {
+  /* Get the text field */
+  var copyText = document.getElementById("embedcode");
+
+  /* Select the text field */
+  copyText.select();
+
+  /* Copy the text inside the text field */
+  document.execCommand("Copy");
+
+  /* Alert the copied text */
+  alert("Copied the link: " + copyText.value);
+}
 $(document).ready(function(){	
 	$.ajaxSetup({
 	      headers: {

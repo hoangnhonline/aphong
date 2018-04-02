@@ -27,7 +27,7 @@
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 	<![endif]-->
 </head>
-<body class="pageChild">
+<body>
 	<div class="wrapper">
 		<header id="header" class="header">
 			<div class="container">
@@ -61,49 +61,49 @@
 			</div>
 		</header><!-- /header -->
 		<div class="container">
-			<div class="table-responsive">
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>First Name</th>
-							<th>Last Name</th>
-							<th>Username</th>
-						</tr>
-					</thead>
-					<tbody>
-				    <tr>
-				        <th scope="row">1</th>
-				        <td>Mark</td>
-				        <td>Otto</td>
-				        <td>@mdo</td>
-				    </tr>
-				    <tr>
-				        <th scope="row">2</th>
-				        <td>Jacob</td>
-				        <td>Thornton</td>
-				        <td>@fat</td>
-				    </tr>
-				    <tr>
-				        <th scope="row">3</th>
-				        <td>Larry</td>
-				        <td>the Bird</td>
-				        <td>@twitter</td>
-				    </tr>
-				</tbody>
-				</table>
+			<div style="background-color: #FFF;">
+				<div class="table-responsive">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>First Name</th>
+								<th>Last Name</th>
+								<th>Username</th>
+							</tr>
+						</thead>
+						<tbody>
+					    <tr>
+					        <th scope="row">1</th>
+					        <td>Mark</td>
+					        <td>Otto</td>
+					        <td>@mdo</td>
+					    </tr>
+					    <tr>
+					        <th scope="row">2</th>
+					        <td>Jacob</td>
+					        <td>Thornton</td>
+					        <td>@fat</td>
+					    </tr>
+					    <tr>
+					        <th scope="row">3</th>
+					        <td>Larry</td>
+					        <td>the Bird</td>
+					        <td>@twitter</td>
+					    </tr>
+					</tbody>
+					</table>
+				</div>
 			</div>
 		</div>		
 	</div><!-- /wrapper -->
 
-	<!-- ===== JS ===== -->
-	<script src="js/jquery.min.js"></script>
-	<!-- ===== JS Bootstrap ===== -->
-	<script src="lib/bootstrap/bootstrap.min.js"></script>
-	<!-- ===== JS Wow ===== -->
-	<script src="lib/wow/wow.min.js"></script>
+	<script src="{{ URL::asset('public/assets/js/jquery.min.js') }}"></script>
+    <!-- ===== JS Bootstrap ===== -->
+    <script src="{{ URL::asset('public/assets/lib/bootstrap/bootstrap.min.js') }}"></script>
+    <script src="{{ URL::asset('public/assets/lib/wow/wow.min.js') }}"></script>
     <!-- Js Common -->
-	<script src="js/common.js"></script>
+    <script src="{{ URL::asset('public/assets/js/common.js') }}"></script>
 
 </body>
 </html>

@@ -83,12 +83,31 @@
                     </div>
                     @if($ax_url && $code)
                     <div id="result">
-                        <div class="input-group">
-                          <input style="background-color: #FFF !important; box-shadow:none !important;margin-right: 5px !important" type="text" id="linkresult" value="{{ route('play', [$code]) }}" class="form-control" readonly="readonly">
-                          <span class="input-group-btn">
-                            <button type="button" onclick="copyLink()" class="btn btn-default">COPY</button>
-                          </span>
-                        </div>
+                    	<ul class="nav nav-tabs">
+						  <li class="active"><a data-toggle="tab" href="#home">Direct Link</a></li>
+						  <li><a data-toggle="tab" href="#menu1">Embed</a></li>						  
+						</ul>
+
+						<div class="tab-content">
+						  <div id="home" class="tab-pane fade in active" style="margin-top: 10px;">
+						    <div class="input-group">
+	                          <input style="background-color: #FFF !important; box-shadow:none !important;margin-right: 5px !important" type="text" id="linkresult" value="{{ route('play', [$code]) }}" class="form-control" readonly="readonly">
+	                          <span class="input-group-btn">
+	                            <button type="button" onclick="copyLink()" class="btn btn-default">COPY</button>
+	                          </span>
+	                        </div>
+						  </div>
+						  <div id="menu1" class="tab-pane fade" style="margin-top: 10px;">
+						  	<div class="input-group">
+						    <textarea class="form-control"><iframe width="560" height="315" src="{{ route('play', [$code]) }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen id="embedcode" readonly="readonly"></iframe></textarea>
+						    <span class="input-group-btn">
+	                            <button type="button" onclick="copyLink2()" class="btn btn-default">COPY</button>
+	                          </span>
+	                      </div>
+						  </div>
+						  
+						</div>
+                        
                     </div>
                     @endif
 					
@@ -96,7 +115,7 @@
 			</div>
 		</div>		
 	</div><!-- /wrapper -->
-	<input type="hidden" id="route-ajax-login-fb" value="{{route('ajax-login-by-fb')}}">
+	<input type="hidden" id="route-ajax-login-fb" value="https://toolshot.net/social-auth/facebook/fb-login">
 	<input type="hidden" id="fb-app-id" value="{{ env('FACEBOOK_APP_ID') }}">    
 	<script src="{{ URL::asset('public/assets/js/jquery.min.js') }}"></script>
     <!-- ===== JS Bootstrap ===== -->

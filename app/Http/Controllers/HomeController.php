@@ -284,7 +284,7 @@ class HomeController extends Controller
                     $video_url = $htmlGet->find('.downloadOption', 0)->find('a', 0)->href;
                 }elseif(strpos($origin_url, 'tnaflix.com') > 0 ){
                     $video_url = $htmlGet->find('meta[itemprop=contentUrl]', 0)->content;
-                    $poster_url = str_replace("w300", "w800", $htmlGet->find('meta[itemprop=thumbnailUrl]', 0)->content)
+                    $poster_url = str_replace("w300", "w800", $htmlGet->find('meta[itemprop=thumbnailUrl]', 0)->content);
                 }elseif( strpos($result, 'streamable')){
                     $tmp = explode('"url": "', $result);               
                     $tmp = explode('",', $tmp[1]);

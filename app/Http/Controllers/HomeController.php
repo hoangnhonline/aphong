@@ -93,7 +93,7 @@ class HomeController extends Controller
             return redirect()->route('home');
         }
         $page = $request->page ? $request->page : 1;
-        $limit = 2;
+        $limit = 100;
         $items = DataVideo::where('customer_id', $user_id)->orderBy('id', 'desc')->paginate($limit);
         return view('link', compact('items', 'page', 'limit'));
 

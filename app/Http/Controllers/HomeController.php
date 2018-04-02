@@ -227,8 +227,12 @@ class HomeController extends Controller
                     if(isset($tmp1[1])){
                         $tmp2 = explode("');", $tmp1[1]);         
                     }else{                        
-                        $tmp1 = explode("setVideoUrlLow('", $result);                             
-                        $tmp2 = explode("');", $tmp1[1]);         
+                        $tmp1 = explode("setVideoUrlLow('", $result);
+                        if(isset($tmp1[1])){                                
+                            $tmp2 = explode("');", $tmp1[1]);         
+                        }else{
+                            echo "Your link does not support, please try another link.";die;
+                        }
                     }  
 
                     $video_url = $tmp2[0];

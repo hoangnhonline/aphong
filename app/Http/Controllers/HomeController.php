@@ -109,7 +109,7 @@ class HomeController extends Controller
         if($ax_url){
             if( strpos($ax_url, 'xvideos') == 0
                 && strpos($ax_url, 'xnxx.com') == 0
-                && strpos($ax_url, 'tnaffix') == 0
+                && strpos($ax_url, 'tnaflix') == 0
                 && strpos($ax_url, 'facebook') == 0 
                 && strpos($ax_url, 'streamable.com') == 0 
                 && strpos($ax_url, 'nodefiles.com') == 0                

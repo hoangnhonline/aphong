@@ -12,7 +12,84 @@ use App\Models\Customer;
 class HomeController extends Controller
 {
     
+    public function curl($url) {
+        $ch = @curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $head[] = "Connection: keep-alive";
+        $head[] = "Keep-Alive: 300";
+        $head[] = "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7";
+        $head[] = "Accept-Language: en-us,en;q=0.5";
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.124 Safari/537.36');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $head);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+        $page = curl_exec($ch);
+        curl_close($ch);
+        return $page;
+    }
+    public function getFacebook($link){
+        if(substr($link, -1) != '/' && is_numeric(substr($link, -1))){
+            $link = $link.'/';
+        }
+        preg_match('/https:\/\/www.facebook.com\/(.*)\/videos\/(.*)\/(.*)\/(.*)/U', $link, $id); // link dạng https://www.facebook.com/userName/videos/vb.IDuser/IDvideo/?type=2&theater
+        if(isset($id[4])){
+            $idVideo = $id[3];
+        }else{
+            preg_match('/https:\/\/www.facebook.com\/(.*)\/videos\/(.*)\/(.*)/U', $link, $id); // link dạng https://www.facebook.com/userName/videos/IDvideo
+            if(isset($id[3])){
+                $idVideo = $id[2];
+            }else{
+                preg_match('/https:\/\/www.facebook.com\/video\.php\?v\=(.*)/', $link, $id); // link dạng https://www.facebook.com/video.php?v=IDvideo
+                $idVideo = $id[1];
+                $idVideo = substr($idVideo, 0, -1);
+            }
+        }
+        $embed = 'https://www.facebook.com/video/embed?video_id='.$idVideo; // đưa link về dạng embed
+        $get = $this->curl($embed);
+ 
+        $HD = explode('"hd_src":', $get);
+        $HD = explode(',', $HD[1]);       
 
+        $HD = str_replace('\/', '/', $HD[0]);   
+        $HD = str_replace('"', '', $HD);     
+        //Link SD
+        $SD = explode('"sd_src":', $get);
+
+        $SD = explode(',', $SD[1]);
+               
+        $SD = $SD[0];
+        $SD = str_replace('\/', '/', $SD);
+        $SD = str_replace('"', '', $SD);
+        
+        if($HD != 'null'){
+            $linkDownload['HD'] = $HD; // link download HD
+        }
+        if($SD){
+            $linkDownload['SD'] = $SD; // link download SD
+        }
+        $imageVideo = '';
+        $tmp = explode("background-image: url(", $get);
+        if(isset($tmp[1])){
+            $tmp = explode(');"', $tmp[1]);
+            if($tmp[0]){
+                $imageVideo = html_entity_decode($tmp[0], ENT_QUOTES);
+                $imageVideo = str_replace('\3a ', ":", $imageVideo);
+                $imageVideo = str_replace('\3d ', "=", $imageVideo);
+                $imageVideo = str_replace('\26 ', "&", $imageVideo);
+                $imageVideo = str_replace("'", "", $imageVideo);
+            }
+        }        
+        $linkVideo = array_values($linkDownload);
+        $return['linkVideo'] = $linkVideo[0]; // link video có độ phân giải lớn nhất
+        $return['imageVideo'] = $imageVideo; // ảnh thumb của video
+        $return['linkDownload'] = $linkDownload; // link download video
+        return $return;
+    }
     public function facebook($url) {
         $poster_url = $video_url = '';
         $useragent = 'Mozilla/5.0 (Linux; U; Android 2.3.3; de-de; HTC Desire Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1';
@@ -153,7 +230,10 @@ class HomeController extends Controller
 
         return view('index', compact('ax_url', 'code'));
     }
+ 
     public function play(Request $request){
+       
+        $license = 0;
         $code = $request->code;
         $origin_url = '';        
         $customer_id = null;
@@ -201,9 +281,12 @@ class HomeController extends Controller
          
         if($origin_url != ''){
             if(strpos($origin_url, 'facebook.com') > 0){
-                $tmp = $this->facebook($origin_url);
-                $video_url = $tmp['video_url'];
-                $poster_url = $tmp['poster_url'];
+                $tmp = $this->getFacebook($origin_url);
+                if($tmp){
+                    $video_url = $tmp['linkVideo'];
+                    $poster_url = $tmp['imageVideo'];    
+                }
+                
             }elseif(strpos($origin_url, 'youtube.com') > 0){                
                 $video_url = $this->youtube($origin_url);
             }else{
